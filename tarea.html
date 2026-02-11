@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarea de Saberes - 3er Grado</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --danger: #e74c3c;
+            --warning: #f1c40f;
+            --success: #2ecc71;
+            --dark: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 600px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Imagen de cabecera */
+        .hero-img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none; /* Se muestra solo en inicio */
+        }
+
+        .active .hero-img {
+            display: block;
+        }
+
+        /* Pantallas */
+        .screen { display: none; }
+        .active { display: block; }
+
+        /* Timer Bar */
+        .timer-container {
+            width: 100%;
+            height: 10px;
+            background: #eee;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .timer-bar {
+            height: 100%;
+            width: 100%;
+            background: var(--success);
+            transition: width 1s linear, background 0.3s;
+        }
+
+        h1 { color: var(--dark); font-size: 1.8rem; margin-bottom: 1rem; }
+        h2 { color: var(--primary); font-size: 1.4rem; margin-bottom: 2rem; }
+        
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 1.5rem;
+            min-height: 60px;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, background 0.2s;
+            width: 100%;
+        }
+
+        button:active { transform: scale(0.98); }
+
+        .btn-option {
+            background-color: #eef2f7;
+            color: #333;
+            border: 2px solid #dae1e7;
+            font-weight: 600;
+        }
+
+        .btn-option:hover {
+            background-color: #dbe2ef;
+            border-color: #cbd5e0;
+        }
+
+        .btn-start {
+            background-color: var(--primary);
+            color: white;
+            font-size: 1.5rem;
+            margin-top: 10px;
+        }
+
+        .stats {
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Resultados */
+        .result-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .score-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 10px 0;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            font-size: 1rem;
+            width: 80%;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+
+        .btn-whatsapp { background-color: #25D366; color: white; }
+        .btn-email { background-color: #EA4335; color: white; }
+
+        /* Animación de feedback */
+        .correct { background-color: var(--success) !important; color: white; }
+        .wrong { background-color: var(--danger) !important; color: white; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- Pantalla de Inicio -->
+        <div id="start-screen" class="screen active">
+            <!-- Imagen decorativa escolar -->
+            <img src="https://img.freepik.com/free-vector/hand-drawn-back-school-background_23-2149056173.jpg?w=800" class="hero-img" alt="Escuela y útiles escolares">
+            
+            <h1>Tarea de Saberes</h1>
+            <p>20 Preguntas | Matemáticas y Español</p>
+            <p style="color: var(--danger); font-weight: bold;">⚠️ Tienes 10 segundos por pregunta.</p>
+            <p>La dificultad aumenta conforme avanzas.</p>
+            <p style="font-size: 0.8rem; color: #666;">🔊 Activa tu sonido para escuchar la alarma y el reloj.</p>
+            <button class="btn-start" onclick="startTest()">¡Comenzar Tarea!</button>
+        </div>
+
+        <!-- Pantalla de Preguntas -->
+        <div id="quiz-screen" class="screen">
+            <div class="stats">
+                <span id="q-progress">Pregunta 1/20</span>
+                <span>Nivel: <strong id="difficulty-badge">Fácil</strong></span>
+            </div>
+            
+            <div class="timer-container">
+                <div id="timer-bar" class="timer-bar"></div>
+            </div>
+
+            <div class="question-text" id="question-text">
+                ¿Cuánto es 2 + 2?
+            </div>
+
+            <div class="options-grid" id="options-container">
+                <!-- Las opciones se generan con JS -->
+            </div>
+        </div>
+
+        <!-- Pantalla de Resultados -->
+        <div id="result-screen" class="screen">
+            <h1>¡Tiempo Terminado!</h1>
+            
+            <div class="result-box">
+                <p>Tu Calificación Final:</p>
+                <div class="score-display"><span id="final-score">0</span>/20</div>
+                <p id="feedback-text">Buen esfuerzo</p>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <p>Ingresa tu nombre para enviar el reporte a la Maestra:</p>
+                <input type="text" id="student-name" placeholder="Nombre del Alumno">
+                
+                <div class="share-buttons">
+                    <button class="btn-whatsapp" onclick="shareWhatsApp()">Enviar por WhatsApp 📱</button>
+                    <button class="btn-email" onclick="shareEmail()">Enviar a missrosaura.prim@gmail.com 📧</button>
+                </div>
+                <!-- Botón de reiniciar eliminado a petición -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- AUDIO ELEMENTS (Enlaces públicos) -->
+    <audio id="sound-tick" src="https://assets.mixkit.co/active_storage/sfx/2578/2578-preview.mp3" preload="auto"></audio>
+    <audio id="sound-correct" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3" preload="auto"></audio>
+    <audio id="sound-wrong" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3" preload="auto"></audio>
+
+    <script>
+        // --- BASE DE DATOS DE PREGUNTAS (Orden: Fácil -> Medio -> Difícil) ---
+        // 20 Preguntas: Mezcla de Matemáticas y Español
+        const questions = [
+            // NIVEL FÁCIL (1-7)
+            { q: "Matemáticas: ¿Cuánto es 50 + 25?", options: ["65", "75", "85"], a: 1, level: "Fácil" },
+            { q: "Español: ¿Cuál es el verbo en la oración: 'El perro corre rápido'?", options: ["Perro", "Rápido", "Corre"], a: 2, level: "Fácil" },
+            { q: "Matemáticas: ¿Qué número sigue en la serie: 2, 4, 6, 8...?", options: ["9", "10", "12"], a: 1, level: "Fácil" },
+            { q: "Español: ¿Cuál palabra está mal escrita?", options: ["Zapato", "Caza", "Vurrito"], a: 2, level: "Fácil" },
+            { q: "Matemáticas: ¿Cuántos lados tiene un triángulo?", options: ["3", "4", "5"], a: 0, level: "Fácil" },
+            { q: "Español: ¿Qué es un sustantivo?", options: ["Una acción", "Una cualidad", "Una persona, animal o cosa"], a: 2, level: "Fácil" },
+            { q: "Matemáticas: 100 - 40 es igual a:", options: ["50", "60", "40"], a: 1, level: "Fácil" },
+
+            // NIVEL MEDIO (8-14)
+            { q: "Matemáticas: ¿Cuánto es 8 x 5?", options: ["35", "40", "45"], a: 1, level: "Medio" },
+            { q: "Español: Sinónimo de 'Feliz':", options: ["Triste", "Contento", "Enojado"], a: 1, level: "Medio" },
+            { q: "Matemáticas: Si tengo 3 manzanas y compro 4 más, ¿cuántas tengo?", options: ["6", "7", "8"], a: 1, level: "Medio" },
+            { q: "Español: ¿Cuál palabra es esdrújula?", options: ["Camión", "Pájaro", "Mesa"], a: 1, level: "Medio" },
+            { q: "Matemáticas: ¿Cuántos minutos tiene una hora?", options: ["30", "60", "100"], a: 1, level: "Medio" },
+            { q: "Español: Antónimo de 'Grande':", options: ["Enorme", "Pequeño", "Alto"], a: 1, level: "Medio" },
+            { q: "Matemáticas: La mitad de 50 es:", options: ["20", "25", "30"], a: 1, level: "Medio" },
+
+            // NIVEL DIFÍCIL (15-20)
+            { q: "Matemáticas: 125 + 125 + 50 =", options: ["300", "250", "350"], a: 0, level: "Difícil" },
+            { q: "Español: ¿Qué signo se usa para hacer una pregunta?", options: ["¡ !", "¿ ?", "( )"], a: 1, level: "Difícil" },
+            { q: "Matemáticas: Si reparto 20 dulces entre 4 niños, ¿cuántos tocan a cada uno?", options: ["4", "5", "6"], a: 1, level: "Difícil" },
+            { q: "Español: Identifica el adjetivo: 'La casa roja es grande'", options: ["Casa", "Es", "Roja"], a: 2, level: "Difícil" },
+            { q: "Matemáticas: ¿Cuál fracción es mayor: 1/2 o 1/4?", options: ["1/2", "1/4", "Son iguales"], a: 0, level: "Difícil" },
+            { q: "Español: Plural de la palabra 'Luz':", options: ["Luzes", "Luces", "Luses"], a: 1, level: "Difícil" }
+        ];
+
+        // --- VARIABLES DE ESTADO ---
+        let currentQ = 0;
+        let score = 0;
+        let timeLeft = 10; // 10 segundos
+        let timerInterval;
+        let isAnswered = false;
+
+        // --- ELEMENTOS DOM ---
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const qText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const timerBar = document.getElementById('timer-bar');
+        const progressText = document.getElementById('q-progress');
+        const difficultyBadge = document.getElementById('difficulty-badge');
+        
+        // --- SONIDOS ---
+        const sTick = document.getElementById('sound-tick');
+        const sCorrect = document.getElementById('sound-correct');
+        const sWrong = document.getElementById('sound-wrong');
+
+        // Función auxiliar para reproducir sonido y reiniciar si ya estaba sonando
+        function playSound(audioEl) {
+            try {
+                audioEl.currentTime = 0;
+                audioEl.play().catch(e => console.log("Audio play blocked or failed: ", e));
+            } catch(e) {
+                console.log("Error playing sound");
+            }
+        }
+
+        // --- FUNCIONES ---
+
+        function startTest() {
+            // Intentar desbloquear audio en interacción inicial
+            playSound(sTick); 
+            sTick.pause();
+            
+            startScreen.classList.remove('active');
+            quizScreen.classList.add('active');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            isAnswered = false;
+            const q = questions[currentQ];
+            
+            // Actualizar UI
+            qText.innerText = q.q;
+            progressText.innerText = `Pregunta ${currentQ + 1}/${questions.length}`;
+            difficultyBadge.innerText = q.level;
+            
+            // Color del badge según dificultad
+            if(q.level === "Fácil") difficultyBadge.style.color = "var(--success)";
+            else if(q.level === "Medio") difficultyBadge.style.color = "var(--warning)";
+            else difficultyBadge.style.color = "var(--danger)";
+
+            // Generar opciones
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option';
+                btn.innerText = opt;
+                btn.onclick = () => selectAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Reiniciar Timer
+            resetTimer();
+        }
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timeLeft = 10; // 10 Segundos
+            updateTimerVisuals();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                playSound(sTick); // Sonido de reloj cada segundo
+                updateTimerVisuals();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeOut(); // Se acabó el tiempo
+                }
+            }, 1000);
+        }
+
+        function updateTimerVisuals() {
+            const percentage = (timeLeft / 10) * 100; // BASE 10
+            timerBar.style.width = percentage + "%";
+            
+            // Cambio de color por tensión (ajustado para 10s)
+            if(timeLeft > 6) timerBar.style.backgroundColor = "var(--success)";
+            else if(timeLeft > 3) timerBar.style.backgroundColor = "var(--warning)";
+            else timerBar.style.backgroundColor = "var(--danger)";
+        }
+
+        function selectAnswer(selectedIndex, btnElement) {
+            if (isAnswered) return;
+            isAnswered = true;
+            clearInterval(timerInterval);
+
+            const correctIndex = questions[currentQ].a;
+            const allButtons = optionsContainer.children;
+
+            if (selectedIndex === correctIndex) {
+                // ACIERTO
+                btnElement.classList.add('correct');
+                score++;
+                playSound(sCorrect); // Sonido Aplauso/Acierto
+            } else {
+                // ERROR
+                if(btnElement) btnElement.classList.add('wrong');
+                allButtons[correctIndex].classList.add('correct');
+                playSound(sWrong); // Sonido Alarma Error
+            }
+
+            // Esperar un poco más para que se escuche el sonido (1.5s)
+            setTimeout(nextQuestion, 1500);
+        }
+
+        function handleTimeOut() {
+            if (isAnswered) return;
+            isAnswered = true;
+            
+            // Sonido de error por tiempo
+            playSound(sWrong);
+
+            // Marcar la correcta
+            const correctIndex = questions[currentQ].a;
+            optionsContainer.children[correctIndex].classList.add('correct');
+            
+            setTimeout(nextQuestion, 1500);
+        }
+
+        function nextQuestion() {
+            currentQ++;
+            if (currentQ < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizScreen.classList.remove('active');
+            resultScreen.classList.add('active');
+            document.getElementById('final-score').innerText = score;
+            
+            // Reproducir sonido de aplausos al final
+            playSound(sCorrect);
+            
+            const feedback = document.getElementById('feedback-text');
+            if(score === 20) feedback.innerText = "¡PERFECTO! Eres un genio 🌟";
+            else if(score >= 15) feedback.innerText = "¡Excelente trabajo! 👍";
+            else if(score >= 10) feedback.innerText = "Bien, pero puedes mejorar 📚";
+            else feedback.innerText = "Necesitas estudiar más 🧐";
+        }
+
+        // --- LÓGICA DE ENVÍO ---
+
+        function getMessage() {
+            const name = document.getElementById('student-name').value.trim() || "Un alumno";
+            return `Hola Miss Rosaura, soy ${name}. Acabo de terminar mi Tarea de Saberes.\n\n📊 Mi calificación: ${score}/20\n🏆 Nivel alcanzado: ${questions.length} preguntas.`;
+        }
+
+        function shareWhatsApp() {
+            const name = document.getElementById('student-name').value;
+            if(!name) { alert("Por favor escribe tu nombre primero"); return; }
+            
+            const msg = getMessage();
+            const url = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+            window.open(url, '_blank');
+        }
+
+        function shareEmail() {
+            const name = document.getElementById('student-name').value;
+            if(!name) { alert("Por favor escribe tu nombre primero"); return; }
+
+            const msg = getMessage();
+            const subject = `Resultados de Tarea de Saberes: ${name}`;
+            const emailTo = "missrosaura.prim@gmail.com"; // CORREO CORREGIDO
+            const url = `mailto:${emailTo}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(msg)}`;
+            window.location.href = url;
+        }
+
+    </script>
+</body>
+</html>
